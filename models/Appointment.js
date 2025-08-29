@@ -8,6 +8,10 @@ const appointmentSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
+  phoneNumber: {
+    type: String,
+    required: false,
+  },
   date: {
     type: Date,
     required: true

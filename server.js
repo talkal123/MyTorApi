@@ -50,7 +50,7 @@ app.get('/user/:id', async (req, res) => {
 // הרשמה - יצירת משתמש חדש עם בדיקה אם המשתמש כבר קיים
 app.post('/user', async (req, res) => {
   try {
-    const { userName, password, email, city, gender,photo } = req.body;
+    const { userName, password, email, city, gender,photo,phoneNumber } = req.body;
     const existingUser = await User.findOne({ userName });
 
     if (existingUser) {
@@ -65,6 +65,24 @@ app.post('/user', async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
+
+app.put('/user/:id' , async (req,res) => {
+  const {id} = req.params
+  const userChanges = req.body
+
+  try {
+  const findUser = await User.findByIdAndUpdate(id, userChanges, { new: true });
+
+  if (!findUser) {
+    return res.status(404).json({ message: `Cannot find user with ID ${id}` });
+  }
+
+  res.status(200).json(findUser);
+} catch (error) {
+  res.status(500).json({ message: error.message });
+}
+})
 
 // התחברות משתמש - אימות מייל וסיסמא
 app.post('/logIn', async (req, res) => {

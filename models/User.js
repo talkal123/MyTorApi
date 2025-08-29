@@ -5,6 +5,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  phoneNumber: {
+    type: String,
+    required: true,
+    default: '000000000'
+  },
   city: {
     type: String,
     required: true

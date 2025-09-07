@@ -12,7 +12,7 @@ const PORT = process.env.PORT || 3000;
 const Mongo_Url = process.env.MONGO_URL;
 const API_KEY_VONAGE = process.env.API_KEY_VONAGE
 const API_KEY_VONAGE_SECRET = process.env.API_KEY_VONAGE_SECRET
-
+const FRONTEND = process.env.FRONTEND
 const cors = require('cors');
 const bcrypt = require('bcrypt');
 const { upload } = require("./cloudinaryConfig.js");
@@ -21,7 +21,7 @@ const { upload } = require("./cloudinaryConfig.js");
 
 app.use(express.json());
 app.use(cors({
-  origin: 'http://localhost:5173'
+  origin: FRONTEND
 }));
 
 

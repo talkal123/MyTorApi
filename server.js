@@ -4,15 +4,30 @@ const Appointment = require('./models/Appointment');
 const Business = require('./models/Business');
 const User = require('./models/User');
 const Review = require('./models/Review');
+const env = require('dotenv').config();
+const { Vonage } = require('@vonage/server-sdk')
+
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
+const Mongo_Url = process.env.MONGO_URL;
+const API_KEY_VONAGE = process.env.API_KEY_VONAGE
+const API_KEY_VONAGE_SECRET = process.env.API_KEY_VONAGE_SECRET
+
 const cors = require('cors');
 const bcrypt = require('bcrypt');
+const { upload } = require("./cloudinaryConfig.js");
+
+
 
 app.use(express.json());
 app.use(cors({
   origin: 'http://localhost:5173'
 }));
+
+
+
+
+
 
 // ------------------
 // ROUTES - TESTING / BASE
@@ -191,7 +206,8 @@ app.delete('/business/:id', async (req, res) => {
 app.post('/business/:id/rate', async (req, res) => { // עובד
   try {
     const { id } = req.params
-    const { userId ,value } = req.body
+    const { userId ,value,userName } = req.body
+    console.log("BODY:", req.body);
     const business = await Business.findById(id);
 
     const businessRated = business.rating.find(rating => rating.userId?.toString() === userId )
@@ -200,13 +216,14 @@ app.post('/business/:id/rate', async (req, res) => { // עובד
       businessRated.value = value
       
     } else {
-      business.rating.push({userId, value})
+      business.rating.push({userId, value, userName})
      
     }
     await business.save()
     res.status(200).json(business.rating);
 
   } catch (error) {
+    console.error("ERROR in /business/:id/rate:", error)
     res.status(500).json({ message: error.message });
   }
 });
@@ -325,13 +342,57 @@ app.put('/appointment/cancel/:id', async (req, res) => {
 
 
 
+app.post("/upload", upload.single("photo"), (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    res.status(200).json({ imageUrl: req.file.path }); 
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message });
+  }
+});
+
+
+
+
+const vonage = new Vonage({
+  apiKey: API_KEY_VONAGE,
+  apiSecret: API_KEY_VONAGE_SECRET 
+})
+
+
+app.post("/send-sms", async (req, res) => {
+  const { phone, message } = req.body;
+
+  if (!phone || !message) {
+    return res.status(400).json({ success: false, error: "Phone or message missing" });
+  }
+
+  try {
+    const response = await vonage.sms.send({
+      to: phone,             // המספר שאליו שולחים (בפורמט בינלאומי)
+      from: "VonageAPI",     // השולח (לא תמיד יוצג)
+      text: message
+    });
+
+    res.json({ success: true, response });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+
   
 // ------------------
 // START SERVER AND CONNECT TO DB
 // ------------------
 
 mongoose
-  .connect('mongodb+srv://talkal:talkal123@cluster0.3gacv.mongodb.net/My-Tor?retryWrites=true&w=majority&appName=Cluster0')
+  .connect(Mongo_Url)
   .then(() => {
     console.log('Connected To MongoDb');
     app.listen(PORT, () => {

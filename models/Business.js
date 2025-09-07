@@ -29,7 +29,7 @@ const businessSchema = new mongoose.Schema({
   },
   businessType: {
     type: String,
-    enum: ['barber', 'restaurant', 'beautySalon', 'clothingStore', 'gym'],
+    enum: ['barber', 'restaurant', 'salon', 'clothes', 'gym'],
     required: true,
   },
   services: [
@@ -37,13 +37,16 @@ const businessSchema = new mongoose.Schema({
       name: String,
       serviceTime: Number,
       price: Number,
+      image: String,
     },
   ],
   rating: [
-  {
-    userId: { type: mongoose.Schema.Types.ObjectId,ref: 'User',},
-    value: Number,
-  }
+    {
+      userId: { type: String, required: true },
+      value: { type: Number, required: true },
+      userName: { type: String, required: true } 
+    }
+  
 ],
   images: {
     type: [String],

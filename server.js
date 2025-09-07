@@ -19,9 +19,9 @@ const { upload } = require("./cloudinaryConfig.js");
 
 
 
-app.use(express.json());
 app.use(cors({
-  origin: FRONTEND
+  origin: FRONTEND,
+  credentials: true
 }));
 
 

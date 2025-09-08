@@ -22,9 +22,13 @@ const { upload } = require("./cloudinaryConfig.js");
 app.use(express.json());
 
 app.use(cors({
-  origin: FRONTEND,
+  origin: [
+    process.env.FRONTEND,
+    "https://my-tor-cty43lt0x-talkal123s-projects.vercel.app"
+  ],
   credentials: true
 }));
+
 
 
 

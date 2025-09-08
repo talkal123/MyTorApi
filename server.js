@@ -5,33 +5,25 @@ const Business = require('./models/Business');
 const User = require('./models/User');
 const Review = require('./models/Review');
 const env = require('dotenv').config();
-const { Vonage } = require('@vonage/server-sdk')
+const { Vonage } = require('@vonage/server-sdk');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-// const Mongo_Url = 'mongodb+srv://talkal:talkal123@cluster0.3gacv.mongodb.net/My-Tor?retryWrites=true&w=majority&appName=Cluster0';
 const Mongo_Url = process.env.MONGO_URL;
-const API_KEY_VONAGE = process.env.API_KEY_VONAGE
-const API_KEY_VONAGE_SECRET = process.env.API_KEY_VONAGE_SECRET
-const FRONTEND = process.env.FRONTEND
+const API_KEY_VONAGE = process.env.API_KEY_VONAGE;
+const API_KEY_VONAGE_SECRET = process.env.API_KEY_VONAGE_SECRET;
+const FRONTEND = process.env.FRONTEND;
 const cors = require('cors');
 const bcrypt = require('bcrypt');
 const { upload } = require("./cloudinaryConfig.js");
 
-
 app.use(express.json());
 
+// CORS רק עבור ה-FRONTEND בפרודקשן
 app.use(cors({
-  origin: [
-    process.env.FRONTEND,     // הפרונטנד המפורסם ב־Vercel
-    "http://localhost:5173",  // פרונטנד מקומי
-    "http://localhost:3001"   // אם תריץ גם על פורט אחר
-  ],
+  origin: FRONTEND,
   credentials: true
 }));
-
-
-
 
 
 

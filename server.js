@@ -9,6 +9,7 @@ const { Vonage } = require('@vonage/server-sdk')
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+// const Mongo_Url = 'mongodb+srv://talkal:talkal123@cluster0.3gacv.mongodb.net/My-Tor?retryWrites=true&w=majority&appName=Cluster0';
 const Mongo_Url = process.env.MONGO_URL;
 const API_KEY_VONAGE = process.env.API_KEY_VONAGE
 const API_KEY_VONAGE_SECRET = process.env.API_KEY_VONAGE_SECRET
@@ -18,12 +19,12 @@ const bcrypt = require('bcrypt');
 const { upload } = require("./cloudinaryConfig.js");
 
 
+app.use(express.json());
 
 app.use(cors({
   origin: FRONTEND,
   credentials: true
 }));
-
 
 
 
@@ -65,21 +66,27 @@ app.get('/user/:id', async (req, res) => {
 // הרשמה - יצירת משתמש חדש עם בדיקה אם המשתמש כבר קיים
 app.post('/user', async (req, res) => {
   try {
-    const { userName, password, email, city, gender,photo,phoneNumber } = req.body;
-    const existingUser = await User.findOne({ userName });
+    console.log("=== Incoming request body ===");
+    console.log(req.body); // בדיקה מה מגיע בבקשה
 
+    const { userName, password, email, city, gender, photo, phoneNumber } = req.body;
+
+    const existingUser = await User.findOne({ userName });
     if (existingUser) {
+      console.log("User already exists:", userName);
       return res.status(400).json({ message: 'This user is already signed up' });
     }
 
-    // כאן כדאי להצפין את הסיסמה לפני השמירה - מומלץ להוסיף bcrypt.hash כאן
-
     const newUser = await User.create(req.body);
+    console.log("New user created:", newUser);
     res.status(200).json(newUser);
   } catch (error) {
+    console.error("Unexpected error in /user route:", error);
     res.status(500).json({ message: error.message });
   }
 });
+
+
 
 
 app.put('/user/:id' , async (req,res) => {
@@ -102,23 +109,38 @@ app.put('/user/:id' , async (req,res) => {
 // התחברות משתמש - אימות מייל וסיסמא
 app.post('/logIn', async (req, res) => {
   try {
+    console.log("=== Incoming login request ===");
+    console.log("req.body:", req.body);
+
     const { email, password } = req.body;
+    console.log("Destructured email:", email);
+    console.log("Destructured password (sent by user, plain text):", password);
+
     const user = await User.findOne({ email });
+    console.log("Found user in DB:", user ? { email: user.email, password: user.password } : null);
 
     if (!user) {
+      console.log("User not found for email:", email);
       return res.status(404).json({ message: 'User not found' });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
+    console.log("Password match result:", isMatch);
+
     if (!isMatch) {
+      console.log("Incorrect password attempt for user:", email);
       return res.status(401).json({ message: 'Incorrect password' });
     }
 
+    console.log("Login successful for user:", email);
     res.status(200).json({ message: 'Login successful', userId: user._id });
   } catch (error) {
+    console.log("Unexpected error in /logIn route:", error);
     res.status(500).json({ message: error.message });
   }
 });
+
+
 
 // ------------------
 // ROUTES - BUSINESSES (עסקים)
@@ -342,19 +364,29 @@ app.put('/appointment/cancel/:id', async (req, res) => {
 
 
 
-app.post("/upload", upload.single("photo"), (req, res) => {
+app.post("/upload", upload.single("photo"), async (req, res) => {
   try {
-    if (!req.file) {
-      return res.status(400).json({ message: "No file uploaded" });
-    }
+    if (!req.file) return res.status(400).json({ message: "No file uploaded" });
 
-    res.status(200).json({ imageUrl: req.file.path }); 
+    const buffer = req.file.buffer;
+
+    const result = await new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        { folder: "MyTor" },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        }
+      );
+      stream.end(buffer);
+    });
+
+    res.status(200).json({ imageUrl: result.secure_url });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: err.message });
   }
 });
-
 
 
 

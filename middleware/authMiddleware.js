@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");              // טוען את הספרייה שאחראית על יצירה ובדיקה של טוקנים (JWT)
-const JWT_SECRET = "mySecretKey123";              // זה הסוד שחתם איתו השרת על הטוקנים – חייב להיות זהה גם לבדיקה
+const JWT_SECRET = process.env.JWT_SECRET || "fallbackSecret123";
+              // זה הסוד שחתם איתו השרת על הטוקנים – חייב להיות זהה גם לבדיקה
             
 const authMiddleware = (req, res, next) => {     // יצרנו פונקציה שבודקת אם המשתמש שלח טוקן – כמו שומר בכניסה
 

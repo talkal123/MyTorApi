@@ -23,8 +23,9 @@ app.use(express.json());
 
 app.use(cors({
   origin: [
-    process.env.FRONTEND,
-    "https://my-tor-cty43lt0x-talkal123s-projects.vercel.app"
+    process.env.FRONTEND,     // הפרונטנד המפורסם ב־Vercel
+    "http://localhost:5173",  // פרונטנד מקומי
+    "http://localhost:3001"   // אם תריץ גם על פורט אחר
   ],
   credentials: true
 }));

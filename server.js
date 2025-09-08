@@ -21,12 +21,17 @@ const { upload } = require("./cloudinaryConfig.js");
 app.use(express.json());
 
 app.use(cors({
-  origin: [
-    process.env.FRONTEND,     // הפרונטנד המפורסם ב־Vercel
-    
-  ],
-  credentials: true
+  origin: process.env.FRONTEND,
+  credentials: true,
+  optionsSuccessStatus: 200
 }));
+
+app.options('*', cors({
+  origin: process.env.FRONTEND,
+  credentials: true,
+  optionsSuccessStatus: 200
+}));
+
 
 
 

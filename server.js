@@ -20,17 +20,15 @@ const { upload } = require("./cloudinaryConfig.js");
 
 app.use(express.json());
 
-app.use(cors({
-  origin: process.env.FRONTEND,
+const corsOptions = {
+  origin: process.env.FRONTEND,  // זה בדיוק ה-frontend שלך
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // כל ה-methods שאתה צריך
+  allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
-  optionsSuccessStatus: 200
-}));
+};
 
-app.options('*', cors({
-  origin: process.env.FRONTEND,
-  credentials: true,
-  optionsSuccessStatus: 200
-}));
+app.use(cors(corsOptions));
+
 
 
 

@@ -371,58 +371,58 @@ app.put('/appointment/cancel/:id', async (req, res) => {
 
 
 
-// app.post("/upload", upload.single("photo"), async (req, res) => {
-//   try {
-//     if (!req.file) return res.status(400).json({ message: "No file uploaded" });
+app.post("/upload", upload.single("photo"), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ message: "No file uploaded" });
 
-//     const buffer = req.file.buffer;
+    const buffer = req.file.buffer;
 
-//     const result = await new Promise((resolve, reject) => {
-//       const stream = cloudinary.uploader.upload_stream(
-//         { folder: "MyTor" },
-//         (error, result) => {
-//           if (error) reject(error);
-//           else resolve(result);
-//         }
-//       );
-//       stream.end(buffer);
-//     });
+    const result = await new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        { folder: "MyTor" },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        }
+      );
+      stream.end(buffer);
+    });
 
-//     res.status(200).json({ imageUrl: result.secure_url });
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ message: err.message });
-//   }
-// });
-
-
-
-// const vonage = new Vonage({
-//   apiKey: API_KEY_VONAGE,
-//   apiSecret: API_KEY_VONAGE_SECRET 
-// })
+    res.status(200).json({ imageUrl: result.secure_url });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message });
+  }
+});
 
 
-// app.post("/send-sms", async (req, res) => {
-//   const { phone, message } = req.body;
 
-//   if (!phone || !message) {
-//     return res.status(400).json({ success: false, error: "Phone or message missing" });
-//   }
+const vonage = new Vonage({
+  apiKey: API_KEY_VONAGE,
+  apiSecret: API_KEY_VONAGE_SECRET 
+})
 
-//   try {
-//     const response = await vonage.sms.send({
-//       to: phone,             // המספר שאליו שולחים (בפורמט בינלאומי)
-//       from: "VonageAPI",     // השולח (לא תמיד יוצג)
-//       text: message
-//     });
 
-//     res.json({ success: true, response });
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ success: false, error: err.message });
-//   }
-// });
+app.post("/send-sms", async (req, res) => {
+  const { phone, message } = req.body;
+
+  if (!phone || !message) {
+    return res.status(400).json({ success: false, error: "Phone or message missing" });
+  }
+
+  try {
+    const response = await vonage.sms.send({
+      to: phone,             // המספר שאליו שולחים (בפורמט בינלאומי)
+      from: "VonageAPI",     // השולח (לא תמיד יוצג)
+      text: message
+    });
+
+    res.json({ success: true, response });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
 
 
   

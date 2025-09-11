@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const cors = require('cors');
 const Appointment = require('./models/Appointment');
 const Business = require('./models/Business');
 const User = require('./models/User');
@@ -14,19 +15,12 @@ const Mongo_Url = process.env.MONGO_URL;
 const FRONTEND = process.env.FRONTEND;
 const API_KEY_VONAGE = process.env.API_KEY_VONAGE
 const API_KEY_VONAGE_SECRET = process.env.API_KEY_VONAGE_SECRET
-const cors = require('cors');
 const bcrypt = require('bcrypt');
 const { upload } = require("./cloudinaryConfig.js");
 
 
 app.use(express.json());
-app.use(cors({
-  origin: [
-    "http://localhost:5173",   // פיתוח
-    process.env.FRONTEND       // פרודקשן (מה־.env)
-  ],
-  credentials: true
-}));
+app.use(cors());
 
 
 // ===== LOGS לבדיקה =====

@@ -4,7 +4,7 @@ const Appointment = require('./models/Appointment');
 const Business = require('./models/Business');
 const User = require('./models/User');
 const Review = require('./models/Review');
-const env = require('dotenv').config();
+require('dotenv').config();
 const { Vonage } = require('@vonage/server-sdk')
 
 const app = express();
@@ -20,18 +20,13 @@ const { upload } = require("./cloudinaryConfig.js");
 
 
 app.use(express.json());
-
 app.use(cors({
   origin: [
-    process.env.FRONTEND,     // הפרונטנד המפורסם ב־Vercel
-    
+    "http://localhost:5173",   // פיתוח
+    process.env.FRONTEND       // פרודקשן (מה־.env)
   ],
   credentials: true
 }));
-
-
-// app.use(cors());
-
 
 
 // ===== LOGS לבדיקה =====

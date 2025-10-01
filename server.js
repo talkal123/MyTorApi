@@ -16,7 +16,7 @@ const FRONTEND = process.env.FRONTEND;
 const API_KEY_VONAGE = process.env.API_KEY_VONAGE
 const API_KEY_VONAGE_SECRET = process.env.API_KEY_VONAGE_SECRET
 const bcrypt = require('bcrypt');
-const { upload } = require("./cloudinaryConfig.js");
+const { upload,cloudinary } = require("./cloudinaryConfig.js");
 
 
 app.use(express.json());

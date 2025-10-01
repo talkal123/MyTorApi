@@ -360,29 +360,44 @@ app.put('/appointment/cancel/:id', async (req, res) => {
 
 
 
+// app.post("/upload", upload.single("photo"), async (req, res) => {
+//   try {
+//     if (!req.file) {
+//       return res.status(400).json({ message: "No file uploaded" });
+//     }
+
+//     // 🔍 כאן תראה בדיוק מה Cloudinary מחזיר
+//     console.log("✅ Full file object:", req.file);
+
+//     res.status(200).json({ imageUrl: req.file.path || req.file.url });
+//   } catch (err) {
+//     console.error("❌ Upload route error:", err);
+//     res.status(500).json({ message: err.message });
+//   }
+// });
+
+
+
 app.post("/upload", upload.single("photo"), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ message: "No file uploaded" });
 
-    const buffer = req.file.buffer;
-
-    const result = await new Promise((resolve, reject) => {
-      const stream = cloudinary.uploader.upload_stream(
-        { folder: "MyTor" },
-        (error, result) => {
-          if (error) reject(error);
-          else resolve(result);
+    const result = await cloudinary.uploader.upload_stream(
+      { folder: "userPhotos" },
+      (err, result) => {
+        if (err) {
+          console.error("Cloudinary Error:", err);
+          return res.status(500).json({ message: "Upload failed" });
         }
-      );
-      stream.end(buffer);
-    });
-
-    res.status(200).json({ imageUrl: result.secure_url });
+        return res.status(200).json({ imageUrl: result.secure_url });
+      }
+    ).end(req.file.buffer); // <-- חשוב מאוד לסגור את ה־stream!
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: err.message });
+    console.error("❌ Upload route error:", err);
+    return res.status(500).json({ message: err.message });
   }
 });
+
 
 
 

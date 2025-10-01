@@ -378,25 +378,23 @@ app.put('/appointment/cancel/:id', async (req, res) => {
 
 
 
-app.post("/upload", upload.single("photo"), async (req, res) => {
+app.post("/upload", upload.single("photo"), (req, res) => {
   try {
-    if (!req.file) return res.status(400).json({ message: "No file uploaded" });
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
 
-    const result = await cloudinary.uploader.upload_stream(
-      { folder: "userPhotos" },
-      (err, result) => {
-        if (err) {
-          console.error("Cloudinary Error:", err);
-          return res.status(500).json({ message: "Upload failed" });
-        }
-        return res.status(200).json({ imageUrl: result.secure_url });
-      }
-    ).end(req.file.buffer); // <-- חשוב מאוד לסגור את ה־stream!
+    console.log("✅ Full file object:", req.file);
+
+    res.status(200).json({
+      imageUrl: req.file.path || req.file.url // Cloudinary מחזיר את הכתובת כאן
+    });
   } catch (err) {
     console.error("❌ Upload route error:", err);
-    return res.status(500).json({ message: err.message });
+    res.status(500).json({ message: err.message });
   }
 });
+
 
 
 

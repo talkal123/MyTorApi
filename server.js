@@ -5,7 +5,7 @@ const Appointment = require('./models/Appointment');
 const Business = require('./models/Business');
 const User = require('./models/User');
 const Review = require('./models/Review');
-const { upload,cloudinary } = require("./cloudinaryConfig.js");
+const { upload, } = require("./cloudinaryConfig.js");
 
 require('dotenv').config();
 const { Vonage } = require('@vonage/server-sdk')
@@ -25,11 +25,6 @@ app.use(cors());
 
 
 // ===== LOGS לבדיקה =====
-console.log("===== Cloudinary ENV Check =====");
-console.log("CLOUD_NAME:", process.env.CLOUD_NAME);
-console.log("API_KEY_CLOUDINARY:", process.env.API_KEY_CLOUDINARY ? "***" : undefined);
-console.log("API_KEY_CLOUDINARY_SECRET:", process.env.API_KEY_CLOUDINARY_SECRET ? "***" : undefined);
-console.log("================================");
 
 
 
@@ -387,20 +382,31 @@ app.put('/appointment/cancel/:id', async (req, res) => {
 
 app.post("/upload", upload.single("photo"), (req, res) => {
   try {
+    // ===== לוג של ENV =====
+    console.log("===== Cloudinary ENV =====");
+    console.log("CLOUD_NAME:", process.env.CLOUD_NAME);
+    console.log("API_KEY_CLOUDINARY:", process.env.API_KEY_CLOUDINARY ? "***" : undefined);
+    console.log("API_KEY_CLOUDINARY_SECRET:", process.env.API_KEY_CLOUDINARY_SECRET ? "***" : undefined);
+    console.log("=========================");
+
+    // ===== לוג של הקובץ שהתקבל =====
     if (!req.file) {
+      console.log("❌ No file uploaded");
       return res.status(400).json({ message: "No file uploaded" });
     }
 
-    console.log("✅ Full file object:", req.file);
+    console.log("✅ Uploaded file object:", req.file);
 
+    // החזרת URL של התמונה
     res.status(200).json({
-      imageUrl: req.file.path || req.file.url // Cloudinary מחזיר את הכתובת כאן
+      imageUrl: req.file.path // Cloudinary מחזיר כאן את הכתובת
     });
   } catch (err) {
     console.error("❌ Upload route error:", err);
     res.status(500).json({ message: err.message });
   }
 });
+
 
 
 

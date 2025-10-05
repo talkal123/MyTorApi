@@ -8,6 +8,27 @@ const Review = require('./models/Review');
 require('dotenv').config();
 const { Vonage } = require('@vonage/server-sdk')
 
+const cloudinary = require("cloudinary").v2;
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const multer = require("multer");
+require("dotenv").config();
+
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY_CLOUDINARY,
+  api_secret: process.env.API_KEY_CLOUDINARY_SECRET,
+});
+
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "userPhotos",
+  },
+});
+
+const upload = multer({ storage });
+
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 // const Mongo_Url = 'mongodb+srv://talkal:talkal123@cluster0.3gacv.mongodb.net/My-Tor?retryWrites=true&w=majority&appName=Cluster0';
@@ -16,7 +37,6 @@ const FRONTEND = process.env.FRONTEND;
 const API_KEY_VONAGE = process.env.API_KEY_VONAGE
 const API_KEY_VONAGE_SECRET = process.env.API_KEY_VONAGE_SECRET
 const bcrypt = require('bcrypt');
-const { upload,cloudinary } = require("./cloudinaryConfig.js");
 
 
 app.use(express.json());
@@ -387,13 +407,14 @@ app.post("/upload", upload.single("photo"), (req, res) => {
     console.log("✅ Full file object:", req.file);
 
     res.status(200).json({
-      imageUrl: req.file.path || req.file.url // Cloudinary מחזיר את הכתובת כאן
+      imageUrl: req.file.path || req.file.url
     });
   } catch (err) {
     console.error("❌ Upload route error:", err);
     res.status(500).json({ message: err.message });
   }
 });
+
 
 
 

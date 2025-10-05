@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -7,7 +9,6 @@ const User = require('./models/User');
 const Review = require('./models/Review');
 const { upload, } = require("./cloudinaryConfig.js");
 
-require('dotenv').config();
 const { Vonage } = require('@vonage/server-sdk')
 
 const app = express();
@@ -450,7 +451,7 @@ mongoose
   .then(() => {
     console.log('Connected To MongoDb');
     app.listen(PORT, () => {
-      console.log('Node API is running on port', PORT);
+      console.log('Node API is running on port test', PORT);
     });
   })
   .catch((error) => {

@@ -5,29 +5,10 @@ const Appointment = require('./models/Appointment');
 const Business = require('./models/Business');
 const User = require('./models/User');
 const Review = require('./models/Review');
+const { upload,cloudinary } = require("./cloudinaryConfig.js");
+
 require('dotenv').config();
 const { Vonage } = require('@vonage/server-sdk')
-
-const cloudinary = require("cloudinary").v2;
-const { CloudinaryStorage } = require("multer-storage-cloudinary");
-const multer = require("multer");
-require("dotenv").config();
-
-cloudinary.config({
-  cloud_name: process.env.CLOUD_NAME,
-  api_key: process.env.API_KEY_CLOUDINARY,
-  api_secret: process.env.API_KEY_CLOUDINARY_SECRET,
-});
-
-const storage = new CloudinaryStorage({
-  cloudinary,
-  params: {
-    folder: "userPhotos",
-  },
-});
-
-const upload = multer({ storage });
-
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -44,6 +25,12 @@ app.use(cors());
 
 
 // ===== LOGS לבדיקה =====
+console.log("===== Cloudinary ENV Check =====");
+console.log("CLOUD_NAME:", process.env.CLOUD_NAME);
+console.log("API_KEY_CLOUDINARY:", process.env.API_KEY_CLOUDINARY ? "***" : undefined);
+console.log("API_KEY_CLOUDINARY_SECRET:", process.env.API_KEY_CLOUDINARY_SECRET ? "***" : undefined);
+console.log("================================");
+
 
 
 // ------------------
@@ -407,14 +394,13 @@ app.post("/upload", upload.single("photo"), (req, res) => {
     console.log("✅ Full file object:", req.file);
 
     res.status(200).json({
-      imageUrl: req.file.path || req.file.url
+      imageUrl: req.file.path || req.file.url // Cloudinary מחזיר את הכתובת כאן
     });
   } catch (err) {
     console.error("❌ Upload route error:", err);
     res.status(500).json({ message: err.message });
   }
 });
-
 
 
 

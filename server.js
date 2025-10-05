@@ -381,6 +381,43 @@ app.post("/upload", upload.single("photo"), async (req, res) => {
 
 
 
+// app.post("/upload", (req, res) => {
+//   try {
+//     // MulterStorage נבנה כאן בתוך ה-route
+//     const storage = new CloudinaryStorage({
+//       cloudinary: require("cloudinary").v2,
+//       params: { folder: "userPhotos" },
+//     });
+//     const upload = multer({ storage });
+
+//     // multer middleware
+//     upload.single("photo")(req, res, (err) => {
+//       if (err) {
+//         console.error("❌ Upload error:", err);
+//         return res.status(500).json({ message: err.message });
+//       }
+
+//       if (!req.file) {
+//         console.log("❌ No file uploaded");
+//         return res.status(400).json({ message: "No file uploaded" });
+//       }
+
+//       console.log("✅ Uploaded file object:", req.file);
+
+//       res.status(200).json({ imageUrl: req.file.path });
+//     });
+//   } catch (err) {
+//     console.error("❌ Route error:", err);
+//     res.status(500).json({ message: err.message });
+//   }
+// });
+
+
+
+
+
+
+
 const vonage = new Vonage({
   apiKey: API_KEY_VONAGE,
   apiSecret: API_KEY_VONAGE_SECRET 

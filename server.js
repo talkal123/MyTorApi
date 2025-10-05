@@ -381,32 +381,37 @@ app.put('/appointment/cancel/:id', async (req, res) => {
 
 
 
-app.post("/upload", upload.single("photo"), (req, res) => {
+app.post("/upload", (req, res) => {
   try {
-    // ===== לוג של ENV =====
-    console.log("===== Cloudinary ENV =====");
-    console.log("CLOUD_NAME:", process.env.CLOUD_NAME);
-    console.log("API_KEY_CLOUDINARY:", process.env.API_KEY_CLOUDINARY ? "***" : undefined);
-    console.log("API_KEY_CLOUDINARY_SECRET:", process.env.API_KEY_CLOUDINARY_SECRET ? "***" : undefined);
-    console.log("=========================");
+    // MulterStorage נבנה כאן בתוך ה-route
+    const storage = new CloudinaryStorage({
+      cloudinary: require("cloudinary").v2,
+      params: { folder: "userPhotos" },
+    });
+    const upload = multer({ storage });
 
-    // ===== לוג של הקובץ שהתקבל =====
-    if (!req.file) {
-      console.log("❌ No file uploaded");
-      return res.status(400).json({ message: "No file uploaded" });
-    }
+    // multer middleware
+    upload.single("photo")(req, res, (err) => {
+      if (err) {
+        console.error("❌ Upload error:", err);
+        return res.status(500).json({ message: err.message });
+      }
 
-    console.log("✅ Uploaded file object:", req.file);
+      if (!req.file) {
+        console.log("❌ No file uploaded");
+        return res.status(400).json({ message: "No file uploaded" });
+      }
 
-    // החזרת URL של התמונה
-    res.status(200).json({
-      imageUrl: req.file.path // Cloudinary מחזיר כאן את הכתובת
+      console.log("✅ Uploaded file object:", req.file);
+
+      res.status(200).json({ imageUrl: req.file.path });
     });
   } catch (err) {
-    console.error("❌ Upload route error:", err);
+    console.error("❌ Route error:", err);
     res.status(500).json({ message: err.message });
   }
 });
+
 
 
 
@@ -451,7 +456,7 @@ mongoose
   .then(() => {
     console.log('Connected To MongoDb');
     app.listen(PORT, () => {
-      console.log('Node API is running on port test', PORT);
+      console.log('Node API is running on port', PORT);
     });
   })
   .catch((error) => {

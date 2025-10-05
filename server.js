@@ -3,41 +3,81 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const multer = require('multer');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const cloudinaryModule = require('cloudinary').v2; // לא לייבא בתוך route, אבל נוכל לקונפיג
 const Appointment = require('./models/Appointment');
 const Business = require('./models/Business');
 const User = require('./models/User');
 const Review = require('./models/Review');
-const { upload, } = require("./cloudinaryConfig.js");
-
-const { Vonage } = require('@vonage/server-sdk')
+const bcrypt = require('bcrypt');
+const { Vonage } = require('@vonage/server-sdk');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-// const Mongo_Url = 'mongodb+srv://talkal:talkal123@cluster0.3gacv.mongodb.net/My-Tor?retryWrites=true&w=majority&appName=Cluster0';
 const Mongo_Url = process.env.MONGO_URL;
 const FRONTEND = process.env.FRONTEND;
-const API_KEY_VONAGE = process.env.API_KEY_VONAGE
-const API_KEY_VONAGE_SECRET = process.env.API_KEY_VONAGE_SECRET
-const bcrypt = require('bcrypt');
-
+const API_KEY_VONAGE = process.env.API_KEY_VONAGE;
+const API_KEY_VONAGE_SECRET = process.env.API_KEY_VONAGE_SECRET;
 
 app.use(express.json());
 app.use(cors());
 
+// ==================
+// ROUTES
+// ==================
 
-// ===== LOGS לבדיקה =====
+// בדיקת שרת
+app.get('/blog', (req, res) => res.send('Hello'));
 
+// ==================
+// UPLOAD ROUTE
+// ==================
+app.post("/upload", (req, res) => {
+  try {
+    // ====== לוגים ENV ======
+    console.log("===== Cloudinary ENV =====");
+    console.log("CLOUD_NAME:", process.env.CLOUD_NAME);
+    console.log("API_KEY_CLOUDINARY:", process.env.API_KEY_CLOUDINARY ? "***" : undefined);
+    console.log("API_KEY_CLOUDINARY_SECRET:", process.env.API_KEY_CLOUDINARY_SECRET ? "***" : undefined);
+    console.log("=========================");
 
+    // ====== Configure Cloudinary ======
+    const cloudinary = cloudinaryModule;
+    cloudinary.config({
+      cloud_name: process.env.CLOUD_NAME,
+      api_key: process.env.API_KEY_CLOUDINARY,
+      api_secret: process.env.API_KEY_CLOUDINARY_SECRET,
+    });
 
-// ------------------
-// ROUTES - TESTING / BASE
-// ------------------
+    // ====== Configure Multer Storage ======
+    const storage = new CloudinaryStorage({
+      cloudinary,
+      params: { folder: "userPhotos" },
+    });
+    const upload = multer({ storage });
 
-// ברירת מחדל - בדיקת תקינות שרת
-app.get('/blog', (req, res) => {
-  res.send('Hello');
+    // ====== Use multer middleware ======
+    upload.single("photo")(req, res, (err) => {
+      if (err) {
+        console.error("❌ Multer/Cloudinary upload error:", err);
+        return res.status(500).json({ message: err.message });
+      }
+
+      if (!req.file) {
+        console.log("❌ No file uploaded");
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+
+      console.log("✅ Uploaded file object:", req.file);
+      res.status(200).json({ imageUrl: req.file.path });
+    });
+
+  } catch (err) {
+    console.error("❌ Upload route error:", err);
+    res.status(500).json({ message: err.message });
+  }
 });
-
 // ------------------
 // ROUTES - USERS (משתמשים)
 // ------------------
@@ -381,36 +421,36 @@ app.put('/appointment/cancel/:id', async (req, res) => {
 
 
 
-app.post("/upload", (req, res) => {
-  try {
-    // MulterStorage נבנה כאן בתוך ה-route
-    const storage = new CloudinaryStorage({
-      cloudinary: require("cloudinary").v2,
-      params: { folder: "userPhotos" },
-    });
-    const upload = multer({ storage });
+// app.post("/upload", (req, res) => {
+//   try {
+//     // MulterStorage נבנה כאן בתוך ה-route
+//     const storage = new CloudinaryStorage({
+//       cloudinary: require("cloudinary").v2,
+//       params: { folder: "userPhotos" },
+//     });
+//     const upload = multer({ storage });
 
-    // multer middleware
-    upload.single("photo")(req, res, (err) => {
-      if (err) {
-        console.error("❌ Upload error:", err);
-        return res.status(500).json({ message: err.message });
-      }
+//     // multer middleware
+//     upload.single("photo")(req, res, (err) => {
+//       if (err) {
+//         console.error("❌ Upload error:", err);
+//         return res.status(500).json({ message: err.message });
+//       }
 
-      if (!req.file) {
-        console.log("❌ No file uploaded");
-        return res.status(400).json({ message: "No file uploaded" });
-      }
+//       if (!req.file) {
+//         console.log("❌ No file uploaded");
+//         return res.status(400).json({ message: "No file uploaded" });
+//       }
 
-      console.log("✅ Uploaded file object:", req.file);
+//       console.log("✅ Uploaded file object:", req.file);
 
-      res.status(200).json({ imageUrl: req.file.path });
-    });
-  } catch (err) {
-    console.error("❌ Route error:", err);
-    res.status(500).json({ message: err.message });
-  }
-});
+//       res.status(200).json({ imageUrl: req.file.path });
+//     });
+//   } catch (err) {
+//     console.error("❌ Route error:", err);
+//     res.status(500).json({ message: err.message });
+//   }
+// });
 
 
 

@@ -1,4 +1,3 @@
-// cloudinaryConfig.js
 const cloudinary = require("cloudinary").v2;
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const multer = require("multer");
@@ -10,6 +9,7 @@ cloudinary.config({
   api_secret: process.env.API_KEY_CLOUDINARY_SECRET,
 });
 
+
 const storage = new CloudinaryStorage({
   cloudinary,
   params: { folder: "userPhotos" },
@@ -17,4 +17,5 @@ const storage = new CloudinaryStorage({
 
 const upload = multer({ storage });
 
-module.exports = { upload }; // חייב להיות בשם upload
+
+module.exports = { upload };

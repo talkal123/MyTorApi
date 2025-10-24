@@ -7,7 +7,8 @@ const Appointment = require('./models/Appointment');
 const Business = require('./models/Business');
 const User = require('./models/User');
 const Review = require('./models/Review');
-const { upload, } = require("./cloudinaryConfig.js");
+const { upload } = require("./cloudinaryConfig.js"); // הנתיב חייב להיות נכון
+console.log("Imported upload:", upload); // בדיקה
 
 const { Vonage } = require('@vonage/server-sdk')
 
@@ -68,7 +69,7 @@ app.post('/user', async (req, res) => {
     console.log("=== Incoming request body ===");
     console.log(req.body); // בדיקה מה מגיע בבקשה
 
-    const { userName, password, email, city, gender, photo, phoneNumber } = req.body;
+    const { userName, password, email, city, gender, photo, phoneNumber, role } = req.body;
 
     const existingUser = await User.findOne({ userName });
     if (existingUser) {
@@ -132,7 +133,7 @@ app.post('/logIn', async (req, res) => {
     }
 
     console.log("Login successful for user:", email);
-    res.status(200).json({ message: 'Login successful', userId: user._id });
+    res.status(200).json({ message: 'Login successful', userId: user._id,role:user.role });
   } catch (error) {
     console.log("Unexpected error in /logIn route:", error);
     res.status(500).json({ message: error.message });
@@ -160,6 +161,17 @@ app.get('/business/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const business = await Business.findById(id);
+    res.status(200).json(business);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// שליפת עסק לפי בעל עסק
+app.get('/business/byOwner/:ownerId', async (req, res) => {
+  try {
+    const { ownerId } = req.params;
+    const business = await Business.find({ ownerId });
     res.status(200).json(business);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -369,12 +381,9 @@ app.post("/upload", upload.single("photo"), async (req, res) => {
       return res.status(400).json({ message: "No file uploaded" });
     }
 
-    // 🔍 כאן תראה בדיוק מה Cloudinary מחזיר
-    console.log("✅ Full file object:", req.file);
 
-    res.status(200).json({ imageUrl: req.file.path || req.file.url });
+    res.status(200).json({ imageUrl: req.file.path });
   } catch (err) {
-    console.error("❌ Upload route error:", err);
     res.status(500).json({ message: err.message });
   }
 });

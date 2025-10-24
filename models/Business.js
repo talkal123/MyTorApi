@@ -23,6 +23,11 @@ const businessSchema = new mongoose.Schema({
     type: String,
     default: "John Doe"
   },
+  ownerId: {
+  type: String,
+  required: false,
+},
+
   businessOwnerPhoto: {
     type: String,
     default: "https://www.gravatar.com/avatar/?d=mp&f=y",

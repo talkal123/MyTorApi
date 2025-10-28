@@ -8,7 +8,6 @@ const Business = require('./models/Business');
 const User = require('./models/User');
 const Review = require('./models/Review');
 const { upload } = require("./cloudinaryConfig.js"); // הנתיב חייב להיות נכון
-console.log("Imported upload:", upload); // בדיקה
 
 const { Vonage } = require('@vonage/server-sdk')
 
@@ -23,7 +22,11 @@ const bcrypt = require('bcrypt');
 
 
 app.use(express.json());
-app.use(cors());
+
+app.use(cors({
+  origin: 'http://localhost:5173', // או ה‑URL של הפרונט שלך
+  credentials: true
+}));
 
 
 // ===== LOGS לבדיקה =====
@@ -389,40 +392,39 @@ app.post("/upload", upload.single("photo"), async (req, res) => {
 });
 
 
+app.post("/google/auth", async (req, res) => {
+  try {
+    const user = req.body;
 
-// app.post("/upload", (req, res) => {
-//   try {
-//     // MulterStorage נבנה כאן בתוך ה-route
-//     const storage = new CloudinaryStorage({
-//       cloudinary: require("cloudinary").v2,
-//       params: { folder: "userPhotos" },
-//     });
-//     const upload = multer({ storage });
+    if (!user || !user.email) {
+      return res.status(400).json({ message: "Invalid user data" });
+    }
 
-//     // multer middleware
-//     upload.single("photo")(req, res, (err) => {
-//       if (err) {
-//         console.error("❌ Upload error:", err);
-//         return res.status(500).json({ message: err.message });
-//       }
+    let findUser = await User.findOne({ email: user.email });
 
-//       if (!req.file) {
-//         console.log("❌ No file uploaded");
-//         return res.status(400).json({ message: "No file uploaded" });
-//       }
+    if (!findUser) {
+      const newUser = await User.create({
+        email: user.email,
+        userName: user.name,
+        photo: user.picture,
+        city: "Unknown",
+        gender: "male",
+        phoneNumber: "000000000",
+        isGoogleUser: true,
+        role: "client",
+        password: Math.random().toString(36).slice(-8)
+      });
 
-//       console.log("✅ Uploaded file object:", req.file);
+      return res.status(200).json(newUser);
+    } else {
+      return res.status(200).json(findUser);
+    }
 
-//       res.status(200).json({ imageUrl: req.file.path });
-//     });
-//   } catch (err) {
-//     console.error("❌ Route error:", err);
-//     res.status(500).json({ message: err.message });
-//   }
-// });
-
-
-
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: error.message });
+  }
+});
 
 
 
@@ -453,6 +455,10 @@ app.post("/send-sms", async (req, res) => {
     res.status(500).json({ success: false, error: err.message });
   }
 });
+
+
+
+
 
 
   

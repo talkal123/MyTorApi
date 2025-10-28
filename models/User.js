@@ -32,7 +32,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ['client', 'admin'],
     default: 'client',
-    required: [true, 'Please enter an password']
+    required: [true, 'Please enter an role']
   },
   photo: {
     type: String,

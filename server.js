@@ -24,7 +24,7 @@ const bcrypt = require('bcrypt');
 app.use(express.json());
 
 app.use(cors({
-  origin: 'http://localhost:5173' || 'https://my-tor-app.vercel.app', // או ה‑URL של הפרונט שלך
+  origin: ['http://localhost:5173', 'https://my-tor-app.vercel.app'], // או ה‑URL של הפרונט שלך
   credentials: true
 }));
 

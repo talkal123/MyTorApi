@@ -288,7 +288,7 @@ app.get('/appointment/:id', async (req, res) => {
   }
 });
 // שליפת תור לפי משתמש
-app.get('/appointment/byUser/:userId', async (req, res) => {
+app.get('/api/appointments/byUser/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
     const appointment = await Appointment.find({userId: userId} );

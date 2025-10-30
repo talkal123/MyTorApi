@@ -467,6 +467,15 @@ app.post("/send-sms", async (req, res) => {
 
 
 
+const path = require("path");
+
+// מחברים את React build
+app.use(express.static(path.join(__dirname, "build")));
+
+// כל route שלא תואם ל-API → מחזיר index.html
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "build", "index.html"));
+});
 
 
 

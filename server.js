@@ -287,6 +287,16 @@ app.get('/appointment/:id', async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+// שליפת תור לפי משתמש
+app.get('/appointment/byUser/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const appointment = await Appointment.find({userId: userId} );
+    res.status(200).json(appointment);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
 // שליפת תורים פעילים בלבד
 app.get('/appointment/active', async (req, res) => {

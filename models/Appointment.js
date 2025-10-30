@@ -4,6 +4,15 @@ const appointmentSchema = new mongoose.Schema({
   businessId: {
   type:String,
   },
+  userId: {
+  type:String,
+  },
+  businessName: {
+  type:String,
+  },
+  businessPhoto: {
+  type:String,
+  },
   clientName: {
     type: String,
     required: false,

@@ -24,7 +24,7 @@ const bcrypt = require('bcrypt');
 app.use(express.json());
 
 app.use(cors({
- 
+ origin: "https://mytorapi-1.onrender.com"
 }));
 
 

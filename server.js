@@ -286,17 +286,14 @@ app.get('/appointment/:id', async (req, res) => {
   }
 });
 // שליפת תור לפי משתמש
-app.get('/api/appointments/byuser', async (req, res) => {
-  // try {
-  //   const { userid } = req.params; // שם כמו ב‑route
-  //   const appointment = await Appointment.find({ userId: userid }); // אם ב‑MongoDB השדה שלך נקרא userId
-  //   res.status(200).json(appointment);
-  // } catch (error) {
-  //   res.status(500).json({ message: error.message });
-  // }
-
-  console.log("Route hit! UserID param:", req.params.userid); // לבדוק אם ה‑route נקלט
-  res.status(200).send("Hello World");
+app.get('/api/appointments/byuser/:userid', async (req, res) => {
+  try {
+    const { userid } = req.params; // שם כמו ב‑route
+    const appointment = await Appointment.find({ userId: userid }); // אם ב‑MongoDB השדה שלך נקרא userId
+    res.status(200).json(appointment);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 });
 
 

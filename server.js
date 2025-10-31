@@ -288,13 +288,14 @@ app.get('/appointment/:id', async (req, res) => {
 // שליפת תור לפי משתמש
 app.get('/api/appointments/byuser/:userid', async (req, res) => {
   try {
-    const { userId } = req.params;
-    const appointment = await Appointment.find({userId: userId} );
+    const { userid } = req.params; // שם כמו ב‑route
+    const appointment = await Appointment.find({ userId: userid }); // אם ב‑MongoDB השדה שלך נקרא userId
     res.status(200).json(appointment);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
+
 
 // שליפת תורים פעילים בלבד
 app.get('/appointment/active', async (req, res) => {

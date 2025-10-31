@@ -286,7 +286,7 @@ app.get('/appointment/:id', async (req, res) => {
   }
 });
 // שליפת תור לפי משתמש
-app.get('/api/appointments/byuser/:userid', async (req, res) => {
+app.get('/api/appointments/byuser', async (req, res) => {
   // try {
   //   const { userid } = req.params; // שם כמו ב‑route
   //   const appointment = await Appointment.find({ userId: userid }); // אם ב‑MongoDB השדה שלך נקרא userId
